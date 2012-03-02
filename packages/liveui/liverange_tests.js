@@ -108,14 +108,14 @@ test("liverange - single node", function () {
   assert.equal(r_b.firstNode(), f.firstChild);
   assert.equal(r_b.lastNode(), f.lastChild);
 
-  var ret1 = r_a.replace_contents(frag("<div id=2></div>"));
+  var ret1 = r_a.replace_contents(frag("<div id=2></div>"), true);
   assert.equal(ret1.nodeType, 11 /* DocumentFragment */);
   assert_dump("<1></1>", ret1);
   assert_dump("<a><2></2></a>", r_a);
   assert_dump("<b><a><2></2></a></b>", r_b);
   assert_dump("<b><a><2></2></a></b>", f);
 
-  var ret2 = r_b.replace_contents(frag("<div id=3></div>"));
+  var ret2 = r_b.replace_contents(frag("<div id=3></div>"), true);
   assert_dump("<a><2></2></a>", ret2);
   assert_dump("<a><2></2></a>", r_a);
   assert_dump("<b><3></3></b>", r_b);

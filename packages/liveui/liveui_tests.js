@@ -131,47 +131,47 @@ test("liveui - one render", function () {
     return R.get();
   })).hold();
 
-  test.equal(R.numListeners(), 1);
+  assert.equal(R.numListeners(), 1);
 
   // frag should be "foo" initially
-  test.equal(frag.html(), "foo");
+  assert.equal(frag.html(), "foo");
   R.set("bar");
   // haven't flushed yet, so update won't have happened
-  test.equal(frag.html(), "foo");
+  assert.equal(frag.html(), "foo");
   Meteor.flush();
   // flushed now, frag should say "bar"
-  test.equal(frag.html(), "bar");
+  assert.equal(frag.html(), "bar");
   R.set("baz");
   frag.release(); // frag is now considered offscreen
   Meteor.flush();
   // no update should have happened, offscreen range dep killed
-  test.equal(frag.html(), "bar");
+  assert.equal(frag.html(), "bar");
 
   // should be back to no listeners
-  test.equal(R.numListeners(), 0);
+  assert.equal(R.numListeners(), 0);
 
   // empty return value should work, and show up as a comment
   frag = WrappedFrag(Meteor.ui.render(function() {
     return "";
   }));
-  test.equal(frag.html(), "<!---->");
+  assert.equal(frag.html(), "<!---->");
 
   // nodes coming and going at top level of fragment
   R.set(true);
   frag = WrappedFrag(Meteor.ui.render(function() {
     return R.get() ? "<div>hello</div><div>world</div>" : "";
   })).hold();
-  test.equal(frag.html(), "<div>hello</div><div>world</div>");
+  assert.equal(frag.html(), "<div>hello</div><div>world</div>");
   R.set(false);
   Meteor.flush();
-  test.equal(frag.html(), "<!---->");
+  assert.equal(frag.html(), "<!---->");
   R.set(true);
   Meteor.flush();
-  test.equal(frag.html(), "<div>hello</div><div>world</div>");
-  test.equal(R.numListeners(), 1);
+  assert.equal(frag.html(), "<div>hello</div><div>world</div>");
+  assert.equal(R.numListeners(), 1);
   frag.release();
   Meteor.flush();
-  test.equal(R.numListeners(), 0);
+  assert.equal(R.numListeners(), 0);
 
   // more complicated changes
   R.set(1);
@@ -183,29 +183,29 @@ test("liveui - one render", function () {
     }
     return result.join('');
   })).hold();
-  test.equal(frag.html(),
+  assert.equal(frag.html(),
                '<div class="foo" id="x0" name="bar"><p><b>1</b></p></div>');
   R.set(3);
   Meteor.flush();
-  test.equal(frag.html(),
+  assert.equal(frag.html(),
                '<div class="foo" id="x0" name="bar"><p><b>3</b></p></div>'+
                '<div class="foo" id="x1" name="bar"><p><b>3</b></p></div>'+
                '<div class="foo" id="x2" name="bar"><p><b>3</b></p></div>');
   R.set(2);
   Meteor.flush();
-  test.equal(frag.html(),
+  assert.equal(frag.html(),
                '<div class="foo" id="x0" name="bar"><p><b>2</b></p></div>'+
                '<div class="foo" id="x1" name="bar"><p><b>2</b></p></div>');
   frag.release();
   Meteor.flush();
-  test.equal(R.numListeners(), 0);
+  assert.equal(R.numListeners(), 0);
 
   // caller violating preconditions
-  test.throws(function() {
+  assert.throws(function() {
     Meteor.ui.render("foo");
   });
 
-  test.throws(function() {
+  assert.throws(function() {
     Meteor.ui.render(function() { return document.createElement("DIV"); });
   });
 });
@@ -218,20 +218,20 @@ test("liveui - onscreen", function () {
     return "<p>The number is "+R.get()+".</p><hr><br><br><u>underlined</u>";
   }));
 
-  test.equal(div.html(), "<p>The number is 123.</p><hr><br><br><u>underlined</u>");
-  test.equal(R.numListeners(), 1);
+  assert.equal(div.html(), "<p>The number is 123.</p><hr><br><br><u>underlined</u>");
+  assert.equal(R.numListeners(), 1);
   Meteor.flush();
   R.set(456); // won't take effect until flush()
-  test.equal(div.html(), "<p>The number is 123.</p><hr><br><br><u>underlined</u>");
-  test.equal(R.numListeners(), 1);
+  assert.equal(div.html(), "<p>The number is 123.</p><hr><br><br><u>underlined</u>");
+  assert.equal(R.numListeners(), 1);
   Meteor.flush();
-  test.equal(div.html(), "<p>The number is 456.</p><hr><br><br><u>underlined</u>");
-  test.equal(R.numListeners(), 1);
+  assert.equal(div.html(), "<p>The number is 456.</p><hr><br><br><u>underlined</u>");
+  assert.equal(R.numListeners(), 1);
 
   div.remove();
   R.set(789); // update should force div dependency to be GCed when div is updated
   Meteor.flush();
-  test.equal(R.numListeners(), 0);
+  assert.equal(R.numListeners(), 0);
 });
 
 test("liveui - tables", function() {
@@ -248,12 +248,12 @@ test("liveui - tables", function() {
 
   R.set(1);
   Meteor.flush();
-  test.equal(table.html(), "<table><tbody><tr><td>1</td></tr></tbody></table>");
+  assert.equal(table.html(), "<table><tbody><tr><td>1</td></tr></tbody></table>");
 
   R.set(10);
-  test.equal(table.html(), "<table><tbody><tr><td>1</td></tr></tbody></table>");
+  assert.equal(table.html(), "<table><tbody><tr><td>1</td></tr></tbody></table>");
   Meteor.flush();
-  test.equal(table.html(), "<table><tbody>"+
+  assert.equal(table.html(), "<table><tbody>"+
                "<tr><td>1</td></tr>"+
                "<tr><td>2</td></tr>"+
                "<tr><td>3</td></tr>"+
@@ -268,10 +268,10 @@ test("liveui - tables", function() {
 
   R.set(0);
   Meteor.flush();
-  test.equal(table.html(), "<table></table>");
+  assert.equal(table.html(), "<table></table>");
   table.kill();
   Meteor.flush();
-  test.equal(R.numListeners(), 0);
+  assert.equal(R.numListeners(), 0);
 
   var div = OnscreenDiv();
   div.node().appendChild(document.createElement("TABLE"));
@@ -281,22 +281,22 @@ test("liveui - tables", function() {
       buf.push("<tr><td>"+(i+1)+"</td></tr>");
     return buf.join('');
   }));
-  test.equal(div.html(), "<table><!----></table>");
+  assert.equal(div.html(), "<table><!----></table>");
   R.set(3);
   Meteor.flush();
-  test.equal(div.html(), "<table><tbody>"+
+  assert.equal(div.html(), "<table><tbody>"+
                "<tr><td>1</td></tr>"+
                "<tr><td>2</td></tr>"+
                "<tr><td>3</td></tr>"+
                "</tbody></table>");
-  test.equal(div.node().firstChild.rows.length, 3);
+  assert.equal(div.node().firstChild.rows.length, 3);
   R.set(0);
   Meteor.flush();
-  test.equal(div.html(), "<table><!----></table>");
+  assert.equal(div.html(), "<table><!----></table>");
   div.kill();
   Meteor.flush();
 
-  test.equal(R.numListeners(), 0);
+  assert.equal(R.numListeners(), 0);
 
   div = OnscreenDiv();
   div.node().appendChild(Meteor.ui._htmlToFragment("<table><tr></tr></table>"));
@@ -308,16 +308,16 @@ test("liveui - tables", function() {
         buf.push("<td>"+(i+1)+"</td>");
       return buf.join('');
     }));
-  test.equal(div.html(),
+  assert.equal(div.html(),
                "<table><tbody><tr><td>1</td><td>2</td><td>3</td>"+
                "</tr></tbody></table>");
   R.set(1);
   Meteor.flush();
-  test.equal(div.html(),
+  assert.equal(div.html(),
                "<table><tbody><tr><td>1</td></tr></tbody></table>");
   div.kill();
   Meteor.flush();
-  test.equal(R.numListeners(), 0);
+  assert.equal(R.numListeners(), 0);
 });
 
 test("liveui - preserved nodes (diff/patch)", function () {
@@ -398,7 +398,7 @@ test("liveui - preserved nodes (diff/patch)", function () {
       });
     var elementsInDom = _.filter(parent.childNodes,
                                  function(x) { return x.nodeType === 1; });
-    test.equal(elementsInList.length, elementsInDom.length);
+    assert.equal(elementsInList.length, elementsInDom.length);
     for(var i=0; i<elementsInList.length; i++) {
       elementsInList[i].node = elementsInDom[i];
       fillInElementIdentities(elementsInList[i].children,
@@ -448,19 +448,19 @@ test("liveui - preserved nodes (diff/patch)", function () {
     var frag = WrappedFrag(Meteor.ui.render(function() {
       return nodeListToHtml(structure, R.get());
     })).hold();
-    test.equal(frag.html(), nodeListToHtml(structure, false) || "<!---->");
+    assert.equal(frag.html(), nodeListToHtml(structure, false) || "<!---->");
     fillInElementIdentities(structure, frag.node());
     var labeledNodes = collectLabeledNodeData(structure);
     R.set(true);
     Meteor.flush();
-    test.equal(frag.html(), nodeListToHtml(structure, true) || "<!---->");
+    assert.equal(frag.html(), nodeListToHtml(structure, true) || "<!---->");
     _.each(labeledNodes, function(x) {
-      test.isTrue(isSameElements(x.parents, getParentChain(x.node)));
+      assert.isTrue(isSameElements(x.parents, getParentChain(x.node)));
     });
 
     frag.release();
     Meteor.flush();
-    test.equal(R.numListeners(), 0);
+    assert.equal(R.numListeners(), 0);
   }
 
 });
@@ -478,21 +478,21 @@ test("liveui - copied attributes", function () {
   })).hold();
   var node1 = frag.node().firstChild;
   var node2 = frag.node().firstChild.getElementsByTagName("input")[0];
-  test.equal(node1.nodeName, "DIV");
-  test.equal(node2.nodeName, "INPUT");
-  test.equal(node1.getAttribute("puppy"), "foo");
-  test.equal(node2.getAttribute("kittycat"), "abcd");
+  assert.equal(node1.nodeName, "DIV");
+  assert.equal(node2.nodeName, "INPUT");
+  assert.equal(node1.getAttribute("puppy"), "foo");
+  assert.equal(node2.getAttribute("kittycat"), "abcd");
 
   R1.set("bar");
   R2.set("efgh");
   Meteor.flush();
-  test.equal(node1.getAttribute("puppy"), "bar");
-  test.equal(node2.getAttribute("kittycat"), "efgh");
+  assert.equal(node1.getAttribute("puppy"), "bar");
+  assert.equal(node2.getAttribute("kittycat"), "efgh");
 
   frag.release();
   Meteor.flush();
-  test.equal(R1.numListeners(), 0);
-  test.equal(R2.numListeners(), 0);
+  assert.equal(R1.numListeners(), 0);
+  assert.equal(R2.numListeners(), 0);
 });
 
 test("liveui - bad labels", function() {
@@ -507,7 +507,7 @@ test("liveui - bad labels", function() {
 
     R.set(false);
     Meteor.flush();
-    test.equal(frag.html(), html2);
+    assert.equal(frag.html(), html2);
     frag.release();
   };
 
@@ -556,28 +556,28 @@ test("liveui - chunks", function() {
       });
   })).hold();
 
-  test.equal(frag.html(), "0,0 0,0 0,0");
+  assert.equal(frag.html(), "0,0 0,0 0,0");
 
   inc(R1); Meteor.flush();
-  test.equal(frag.html(), "1,1 0,1 0,1");
+  assert.equal(frag.html(), "1,1 0,1 0,1");
 
   inc(R2); Meteor.flush();
-  test.equal(frag.html(), "1,1 1,2 0,2");
+  assert.equal(frag.html(), "1,1 1,2 0,2");
 
   inc(R3); Meteor.flush();
-  test.equal(frag.html(), "1,1 1,2 1,3");
+  assert.equal(frag.html(), "1,1 1,2 1,3");
 
   inc(R2); Meteor.flush();
-  test.equal(frag.html(), "1,1 2,3 1,4");
+  assert.equal(frag.html(), "1,1 2,3 1,4");
 
   inc(R1); Meteor.flush();
-  test.equal(frag.html(), "2,2 2,4 1,5");
+  assert.equal(frag.html(), "2,2 2,4 1,5");
 
   frag.release();
   Meteor.flush();
-  test.equal(R1.numListeners(), 0);
-  test.equal(R2.numListeners(), 0);
-  test.equal(R3.numListeners(), 0);
+  assert.equal(R1.numListeners(), 0);
+  assert.equal(R2.numListeners(), 0);
+  assert.equal(R3.numListeners(), 0);
 
   R1.set(0);
   R2.set(0);
@@ -599,56 +599,56 @@ test("liveui - chunks", function() {
     return buf.join('');
   })).hold();
 
-  test.equal(frag.html(), '<div class="foo0"><!----></div>');
+  assert.equal(frag.html(), '<div class="foo0"><!----></div>');
   R2.set(3); Meteor.flush();
-  test.equal(frag.html(), '<div class="foo0">'+
+  assert.equal(frag.html(), '<div class="foo0">'+
                '<div>0</div><div>0</div><div>0</div>'+
                '</div>');
 
   R3.set(5); Meteor.flush();
-  test.equal(frag.html(), '<div class="foo0">'+
+  assert.equal(frag.html(), '<div class="foo0">'+
                '<div>5</div><div>5</div><div>5</div>'+
                '</div>');
 
   R1.set(7); Meteor.flush();
-  test.equal(frag.html(), '<div class="foo7">'+
+  assert.equal(frag.html(), '<div class="foo7">'+
                '<div>5</div><div>5</div><div>5</div>'+
                '</div>');
 
   R2.set(1); Meteor.flush();
-  test.equal(frag.html(), '<div class="foo7">'+
+  assert.equal(frag.html(), '<div class="foo7">'+
                '<div>5</div>'+
                '</div>');
 
   R1.set(11); Meteor.flush();
-  test.equal(frag.html(), '<div class="foo11">'+
+  assert.equal(frag.html(), '<div class="foo11">'+
                '<div>5</div>'+
                '</div>');
 
   R2.set(2); Meteor.flush();
-  test.equal(frag.html(), '<div class="foo11">'+
+  assert.equal(frag.html(), '<div class="foo11">'+
                '<div>5</div><div>5</div>'+
                '</div>');
 
   R3.set(4); Meteor.flush();
-  test.equal(frag.html(), '<div class="foo11">'+
+  assert.equal(frag.html(), '<div class="foo11">'+
                '<div>4</div><div>4</div>'+
                '</div>');
 
   frag.release();
 
   // caller violating preconditions
-  test.throws(function() {
+  assert.throws(function() {
     Meteor.ui.chunk(function() { return "foo"; });
   });
 
-  test.throws(function() {
+  assert.throws(function() {
     Meteor.ui.render(function() {
       return Meteor.ui.chunk("foo");
     });
   });
 
-  test.throws(function() {
+  assert.throws(function() {
     Meteor.ui.render(function() {
       return Meteor.ui.chunk(function() {
         return {};
@@ -659,7 +659,7 @@ test("liveui - chunks", function() {
 });
 
 test("liveui - repeated chunk", function() {
-  test.throws(function() {
+  assert.throws(function() {
     var frag = Meteor.ui.render(function() {
       var x = Meteor.ui.chunk(function() {
         return "abc";
@@ -672,7 +672,7 @@ test("liveui - repeated chunk", function() {
 test("liveui - leaderboard", function() {
   // use a simplified, local leaderboard to test some stuff
 
-  var players = new LocalCollection();
+  var players = new Collection();
   var selected_player = ReactiveVar();
 
   var scores = OnscreenDiv(Meteor.ui.render(function() {
@@ -718,18 +718,18 @@ test("liveui - leaderboard", function() {
 
   Meteor.flush();
   var glinnesNameNode = findPlayerNameDiv(names[0]);
-  test.isTrue(!! glinnesNameNode);
+  assert.isTrue(!! glinnesNameNode);
   var glinnesScoreNode = glinnesNameNode.nextSibling;
-  test.equal(glinnesScoreNode.getAttribute("name"), "score");
+  assert.equal(glinnesScoreNode.getAttribute("name"), "score");
   simulateEvent(glinnesNameNode, 'click');
   Meteor.flush();
   glinnesNameNode = findPlayerNameDiv(names[0]);
-  test.isTrue(!! glinnesNameNode);
-  test.equal(glinnesNameNode.parentNode.className, 'player selected');
+  assert.isTrue(!! glinnesNameNode);
+  assert.equal(glinnesNameNode.parentNode.className, 'player selected');
   var glinnesId = players.findOne({name: names[0]})._id;
-  test.isTrue(!! glinnesId);
-  test.equal(selected_player.get(), glinnesId);
-  test.equal(
+  assert.isTrue(!! glinnesId);
+  assert.equal(selected_player.get(), glinnesId);
+  assert.equal(
     Meteor.ui._canonicalizeHtml(glinnesNameNode.parentNode.innerHTML),
     '<div class="name">Glinnes Hulden</div><div name="score">0</div>');
 
@@ -738,12 +738,12 @@ test("liveui - leaderboard", function() {
 
   glinnesNameNode = findPlayerNameDiv(names[0], glinnesNameNode);
   var glinnesScoreNode2 = glinnesNameNode.nextSibling;
-  test.equal(glinnesScoreNode2.getAttribute("name"), "score");
+  assert.equal(glinnesScoreNode2.getAttribute("name"), "score");
   // move and patch should leave score node the same, because it
   // has a name attribute!
-  test.equal(glinnesScoreNode, glinnesScoreNode2);
-  test.equal(glinnesNameNode.parentNode.className, 'player selected');
-  test.equal(
+  assert.equal(glinnesScoreNode, glinnesScoreNode2);
+  assert.equal(glinnesNameNode.parentNode.className, 'player selected');
+  assert.equal(
     Meteor.ui._canonicalizeHtml(glinnesNameNode.parentNode.innerHTML),
     '<div class="name">Glinnes Hulden</div><div name="score">5</div>');
 
@@ -751,17 +751,17 @@ test("liveui - leaderboard", function() {
   Meteor.flush();
 
   glinnesNameNode = findPlayerNameDiv(names[0], glinnesNameNode);
-  test.equal(
+  assert.equal(
     Meteor.ui._canonicalizeHtml(glinnesNameNode.parentNode.innerHTML),
     '<div class="name">Glinnes Hulden</div><div name="score">10</div>');
 
   scores.kill();
   Meteor.flush();
-  test.equal(selected_player.numListeners(), 0);
+  assert.equal(selected_player.numListeners(), 0);
 });
 
 test("liveui - listChunk table", function() {
-  var c = new LocalCollection();
+  var c = new Collection();
 
   c.insert({value: "fudge", order: "A"});
   c.insert({value: "sundae", order: "B"});
@@ -788,9 +788,9 @@ test("liveui - listChunk table", function() {
 
   var shouldFlushTo = function(html) {
     // same before flush
-    test.equal(table.html(), lastHtml);
+    assert.equal(table.html(), lastHtml);
     Meteor.flush();
-    test.equal(table.html(), html);
+    assert.equal(table.html(), html);
     lastHtml = html;
   };
   var tableOf = function(/*htmls*/) {
@@ -803,7 +803,7 @@ test("liveui - listChunk table", function() {
     }
   };
 
-  test.equal(table.html(), lastHtml = tableOf('fudge', 'sundae'));
+  assert.equal(table.html(), lastHtml = tableOf('fudge', 'sundae'));
 
   // switch order
   c.update({value: "fudge"}, {$set: {order: "BA"}});
@@ -872,10 +872,10 @@ test("liveui - listChunk table", function() {
     null,
     _.map(_.range(1,9), function(n) { return valueFunc(n)+R.get(); })));
 
-  test.equal(table.node().firstChild.rows.length, 8);
+  assert.equal(table.node().firstChild.rows.length, 8);
 
   var bolds = table.node().firstChild.getElementsByTagName('B');
-  test.equal(bolds.length, 8);
+  assert.equal(bolds.length, 8);
   _.each(bolds, function(b) {
     b.nifty = true; // mark the nodes
   });
@@ -885,10 +885,10 @@ test("liveui - listChunk table", function() {
     null,
     _.map(_.range(1,9), function(n) { return valueFunc(n)+R.get(); })));
   var bolds2 = table.node().firstChild.getElementsByTagName('B');
-  test.equal(bolds2.length, 8);
+  assert.equal(bolds2.length, 8);
   // make sure patching is actually happening
   _.each(bolds2, function(b) {
-    test.equal(b.nifty, true);
+    assert.equal(b.nifty, true);
   });
 
   // change value func, and still we should be patching
@@ -900,9 +900,9 @@ test("liveui - listChunk table", function() {
     null,
     _.map(_.range(1,9), function(n) { return valueFunc2(n)+R.get(); })));
   var bolds3 = table.node().firstChild.getElementsByTagName('B');
-  test.equal(bolds3.length, 8);
+  assert.equal(bolds3.length, 8);
   _.each(bolds3, function(b) {
-    test.equal(b.nifty, true);
+    assert.equal(b.nifty, true);
   });
 
   table.release();
