@@ -1,4 +1,5 @@
-// XXX SECTION: LiveRange
+
+(function() {
 
 /******************************************************************************/
 
@@ -156,6 +157,24 @@ test("liverange - single node", function () {
 
   r_e.destroy();
   assert_dump("<c><3></3></c>", r_c);
+
+});
+
+test("liverange - empty replace", function() {
+  var f,r;
+
+  f = frag("<div id=1></div>");
+  r = create("z", f);
+  assert.throws(function() {
+    r.replace_contents(frag(""));
+  });
+
+  f = frag("<div id=1></div><div id=2></div><div id=3></div>");
+  r = create("z", f.childNodes[1]);
+  assert_dump("<1></1><z><2></2></z><3></3>", f);
+  assert.throws(function() {
+    r.replace_contents(frag(""));
+  });
 });
 
 test("liverange - multiple nodes", function () {
@@ -242,7 +261,7 @@ test("liverange - multiple nodes", function () {
   var r_o = create("o", f3.childNodes[0], f3.childNodes[0]);
   assert_dump("<m><o><n><9></9></n></o><10></10><11></11></m>", f3);
 
-  var ret1 = r_i.replace_contents(f3);
+  var ret1 = r_i.replace_contents(f3, true);
   assert_dump("", f3);
   assert_dump("<2></2><f><c><a><e><3></3></e><d><b><4></4></b></d></a></c></f>", ret1);
   assert_dump("<l><k><6></6><j><7><h><g><1></1><i><m><o><n><9></9></n></o><10></10><11></11></m></i></g></h><5></5></7><8></8></j></k></l>", f2);
@@ -442,3 +461,5 @@ test("liverange - create inner", function () {
     }
   );
 });
+
+})();

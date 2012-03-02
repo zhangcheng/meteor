@@ -101,7 +101,7 @@ Meteor._Alea = function () {
     return random;
 
   } (Array.prototype.slice.call(arguments)));
-}
+};
 
 // instantiate RNG.  use the default seed, which is current time.
 Meteor.random = new Meteor._Alea();

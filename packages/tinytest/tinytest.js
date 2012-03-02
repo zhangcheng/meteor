@@ -189,7 +189,8 @@ var test_assert = {
     if (obj.length === expected_length)
       test.ok();
     else
-      test.fail({type: "length"}); // XXX what other data?
+      test.fail({type: "length", expected: expected_length,
+                 actual: obj.length});
   },
 
   // XXX nodejs assert.throws can take an expected error, as a class,
